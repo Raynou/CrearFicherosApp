@@ -1,9 +1,13 @@
 package com.example.tomarscreenyguardar;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -21,10 +25,14 @@ import static com.example.tomarscreenyguardar.TomarScreenshot.tomarCaptura;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int REQUEST_CODE_ASK_PERMISSION = 111;
     ImageView image;
     ImageView imageDestiny;
     Button btnSave, btnTakeScreen;
     EditText myEdTxt;
+
+    private final String dirName = "AppSS";
+    private File fileDir = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         init();
+        callPermission();
+        fileDir = creaetDirectory(dirName);
+
     }
 
 
@@ -45,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveImageOnGallery();
+                saveImageOnGallery(fileDir);
                 Toast.makeText(MainActivity.this, "Imagen guardada", Toast.LENGTH_SHORT).show();
             }
         });
@@ -60,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Es el método el que no permite guardar las imágenes
-    private void saveImageOnGallery() {
+    private void saveImageOnGallery(File dir) {
 
         try {
             BitmapDrawable bitmapDrawable =  (BitmapDrawable) imageDestiny.getDrawable();
@@ -68,77 +79,69 @@ public class MainActivity extends AppCompatActivity {
 
             FileOutputStream outputStream = null;
 
-            File file = Environment.getExternalStorageDirectory();
+            String filename = String.format("%d.png",System.currentTimeMillis());
 
-            File dir = new File(file, "/ScreenPictures/");
-
-            dir.mkdirs();
-
-            //Creas el nombre del archivo
-            String filename = String.format(Locale.getDefault(),"%d.png",System.currentTimeMillis());
-
-            //Crear ya el archivo con su dirección de salida
             File outFile = new File(dir,filename);
 
 
             try{
-                //Como tal, aquí ya estás mandado el archivo
-                //Aquí está el error
+
                 outputStream = new FileOutputStream(outFile);
             }catch (Exception e){
                 e.printStackTrace();
                 Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
-               myEdTxt.setText(e.toString());
+                myEdTxt.setText(e.toString());
             }
 
-            //Y aquí lo estás comprimiendo?
             bitmap.compress(Bitmap.CompressFormat.PNG,100,outputStream);
             try{
-                //??
                 outputStream.flush();
             }catch (Exception e){
-                //acá no hay error
                 e.printStackTrace();
-                Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
-                myEdTxt.setText(e.toString());
 
             }
             try{
-                //Cierras la escritura, aquí, se comprende
                 outputStream.close();
             }
             catch (Exception e){
                 e.printStackTrace();
-                Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
-                myEdTxt.setText(e.toString());
+
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
-            myEdTxt.setText(e.toString());
         }
 
 
     }
 
-    //Tal parece que se están presentando errores en la creación del archivo o del directorio
-    /*java.io.FileNotFoundException: /storage/emulated/0/MyPics/1617481829247.png: open failed: ENOENT (No such file or directory)*/
+    private File creaetDirectory(String dir) {
+        File file = new File(Environment.getExternalStorageDirectory(),dir);
 
-    //En otras palabras, el error se origina en la creación del archivo
+        if (!file.exists()){
 
-    public void createDirectory(){
-        try {
-            File file = new File(Environment.getExternalStorageDirectory(), "/LoteriaApp/");
+            file.mkdir();
 
-            boolean elDirectorioEstaCreado = file.exists();
-            if (!elDirectorioEstaCreado){
-                file.mkdirs();
-            }if (elDirectorioEstaCreado){
-                //Do something
+            Toast.makeText(MainActivity.this,"Successful",Toast.LENGTH_SHORT).show();
+        }else
+        {
+
+            Toast.makeText(MainActivity.this,"Folder Already Exists",Toast.LENGTH_SHORT).show();
+
+
+        }
+        return file;
+    }
+
+
+    private void callPermission() {
+        int permisosDeLecturaDeAlmacenamiento = ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permisosDeEscrituraDeAlmacenamiento = ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        if (permisosDeLecturaDeAlmacenamiento != PackageManager.PERMISSION_GRANTED || permisosDeEscrituraDeAlmacenamiento != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_ASK_PERMISSION);
             }
-        }catch (Exception e){
-            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
         }
 
     }
