@@ -22,11 +22,20 @@
         <ImageView
             android:layout_width="350px"
             android:layout_height="350px"
-            android:src="@mipmap/ic_launcher"
+            android:src="@drawable/yo"
             android:layout_gravity="center"
             android:id="@+id/myImgVw">
 
         </ImageView>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnTake"
+            android:text="Tomar screen"
+            android:layout_gravity="center">
+
+        </Button>
 
         <Button
             android:layout_width="wrap_content"
@@ -45,6 +54,14 @@
 
         </EditText>
 
+        <ImageView
+            android:layout_width="350px"
+            android:layout_height="350px"
+            android:src="@drawable/ic_launcher_background"
+            android:layout_gravity="center"
+            android:id="@+id/scndImageView">
+
+        </ImageView>
 
     </LinearLayout>
 
