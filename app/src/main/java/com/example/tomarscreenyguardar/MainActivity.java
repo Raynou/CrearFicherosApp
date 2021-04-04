@@ -25,6 +25,7 @@ import static com.example.tomarscreenyguardar.TomarScreenshot.tomarCaptura;
 
 public class MainActivity extends AppCompatActivity {
 
+    //Problemas con la creación de un fichero
     private static final int REQUEST_CODE_ASK_PERMISSION = 111;
     ImageView image;
     ImageView imageDestiny;
