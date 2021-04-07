@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private File creaetDirectory(String dir) {
-        File file = new File(Environment.getExternalStorageDirectory(),dir);
+        File file = new File(getExternalFilesDir(null),dir);
 
         if (!file.exists()){
 
